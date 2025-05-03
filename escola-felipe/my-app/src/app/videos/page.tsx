@@ -591,10 +591,16 @@ export default function VideosPage() {
         {/* Mensagem motivacional para alunos - visível apenas para não-administradores */}
         {!isAdmin && currentUser && (
           <div className="absolute left-1/2 transform -translate-x-1/2 text-white font-bold" style={{
-            fontSize: '28px',
+            fontSize: 'clamp(16px, 4vw, 28px)',
             textShadow: '0 0 10px rgba(255,255,255,0.7)',
             letterSpacing: '0.7px',
-            animation: 'pulseGlow 2s infinite ease-in-out'
+            animation: 'pulseGlow 2s infinite ease-in-out',
+            textAlign: 'center',
+            width: '90%',
+            maxWidth: '600px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
           }}>
             "A Repetição leva à Perfeição"
           </div>
@@ -633,7 +639,17 @@ export default function VideosPage() {
           <div key={module.id} className="space-y-4">
             {/* Título do módulo */}
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-white">{module.title}</h2>
+              <h2 className="text-2xl font-bold text-white" style={{
+                fontSize: module.title.length > 40 ? '1.25rem' : '1.5rem',
+                lineHeight: '1.3',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                wordBreak: 'break-word',
+                hyphens: 'auto',
+                maxWidth: '100%',
+                padding: '0.25rem 0'
+                // Removed the media query that was causing the error
+              }}>{module.title}</h2>
             </div>
             
             {/* Carrossel de vídeos */}
@@ -677,6 +693,10 @@ export default function VideosPage() {
                   <div 
                     key={video.id} 
                     className="flex-shrink-0 w-65 bg-gray-800 rounded-lg overflow-hidden shadow-lg border border-gray-700 hover:border-orange-500 transition-colors relative"
+                    style={{
+                      maxWidth: '280px',
+                      minWidth: '220px'
+                    }}
                   >
                     {!isVideoLiberadoParaUsuario(video.id) && !isAdmin && (
                       <div className="absolute inset-0 bg-black bg-opacity-40 z-0">
@@ -767,16 +787,19 @@ export default function VideosPage() {
                           title={video.title}
                           style={{
                             fontSize: video.title.length > 30 ? `${Math.max(0.7, Math.min(1, 15 / Math.max(1, video.title.length / 12)))}rem` : '1rem',
-                            lineHeight: '1.3',
-                            minHeight: '2.5rem', // Aumentado de 1.5rem para 2.5rem
-                            maxHeight: '4rem',   // Aumentado de 3rem para 4rem
+                            lineHeight: '1.2',
+                            minHeight: '2.5rem',
+                            maxHeight: '4rem',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             overflow: 'hidden',
+                            textOverflow: 'ellipsis',
                             wordBreak: 'break-word',
                             hyphens: 'auto',
-                            padding: '0.25rem'   // Adicionado padding para melhor espaçamento
+                            padding: '0.25rem',
+                            width: '100%',
+                            whiteSpace: 'normal'
                           }}
                         >
                           {video.title}
