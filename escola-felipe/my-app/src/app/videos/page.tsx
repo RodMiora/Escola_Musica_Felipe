@@ -50,15 +50,8 @@ export default function VideosPage() {
   const [videoSelecionado, setVideoSelecionado] = useState<any>(null);
   const [youtubeLinks, setYoutubeLinks] = useState<{[key: number]: string}>({});
   
-  // Adicionar estados para edição de título
-  const [editingTitleId, setEditingTitleId] = useState<number | null>(null);
-  const [editedTitle, setEditedTitle] = useState<string>('');
-  // Adicionar estado para armazenar os módulos
+  // Estado para armazenar os módulos
   const [modulesList, setModulesList] = useState<typeof modules>([]);
-  
-  // Adicionar estados para edição de título de módulo
-  const [editingModuleId, setEditingModuleId] = useState<number | null>(null);
-  const [editedModuleTitle, setEditedModuleTitle] = useState<string>('');
   
   // Valores fixos para o equalizador inicial (evita problemas de hidratação)
   const staticBars = [0.6, 0.8, 0.7, 0.9, 0.6];
@@ -242,54 +235,7 @@ export default function VideosPage() {
     return false;
   };
   
-  // Função para iniciar a edição do título
-  const startEditingTitle = (e: React.MouseEvent, video: any) => {
-    if (!isAdmin) return;
-    e.stopPropagation();
-    setEditingTitleId(video.id);
-    setEditedTitle(video.title);
-  };
-
-  // Função para salvar o título editado
-  const saveEditedTitle = (videoId: number, moduleId: number) => {
-    // Criar uma cópia profunda dos módulos
-    const updatedModules = JSON.parse(JSON.stringify(modulesList));
-    const moduleIndex = updatedModules.findIndex(m => m.id === moduleId);
-    
-    if (moduleIndex !== -1) {
-      const videoIndex = updatedModules[moduleIndex].videos.findIndex(v => v.id === videoId);
-      
-      if (videoIndex !== -1) {
-        updatedModules[moduleIndex].videos[videoIndex].title = editedTitle;
-        
-        // Atualizar o estado dos módulos
-        setModulesList(updatedModules);
-        
-        // Salvar no localStorage para persistir entre recarregamentos
-        const savedTitles = localStorage.getItem('videoTitles');
-        let titlesMap = {};
-        
-        if (savedTitles) {
-          try {
-            titlesMap = JSON.parse(savedTitles);
-          } catch (error) {
-            console.error('Erro ao carregar títulos salvos:', error);
-          }
-        }
-        
-        // Atualizar o mapa de títulos
-        titlesMap = {
-          ...titlesMap,
-          [videoId]: editedTitle
-        };
-        
-        // Salvar o mapa atualizado
-        localStorage.setItem('videoTitles', JSON.stringify(titlesMap));
-      }
-    }
-    
-    setEditingTitleId(null);
-  };
+  // Funções de edição de título removidas
 
   // Módulos de violão organizados sequencialmente
   const modules = [
@@ -301,35 +247,35 @@ export default function VideosPage() {
           id: 101, 
           title: 'Partes do violão', 
           duration: '12:30',
-          thumbnail: '/modulo1-aula01.png',
-          level: 'iniciante'
+          thumbnail: '/imagens/Sem_titulo.jpg',
+        
         },
         { 
           id: 102, 
           title: 'Tipos de violão', 
           duration: '10:15',
-          thumbnail: 'https://source.unsplash.com/random/300x200/?acoustic,guitar',
-          level: 'iniciante'
+          thumbnail: '/imagens/Postura.jpg',
+        
         },
         { 
           id: 103, 
           title: 'Afinação básica', 
           duration: '15:45',
-          thumbnail: 'https://source.unsplash.com/random/300x200/?guitar,tuning',
+          thumbnail: '/imagens/afinando.png',
           level: 'iniciante'
         },
         { 
           id: 104, 
           title: 'Cuidados com o instrumento', 
           duration: '8:50',
-          thumbnail: 'https://source.unsplash.com/random/300x200/?guitar,care',
+          thumbnail: '/imagens/diagrama.png',
           level: 'iniciante'
         },
         { 
           id: 105, 
           title: 'História do violão', 
           duration: '14:20',
-          thumbnail: 'https://source.unsplash.com/random/300x200/?guitar,history',
+          thumbnail: '/imagens/Sem_titulo.jpg',
           level: 'iniciante'
         },
         { 
@@ -676,41 +622,52 @@ export default function VideosPage() {
                 {module.videos.map((video) => (
                   <div 
                     key={video.id} 
-                    className="flex-shrink-0 w-65 bg-gray-800 rounded-lg overflow-hidden shadow-lg border border-gray-700 hover:border-orange-500 transition-colors relative"
+                    className="flex-shrink-0 w-65 rounded-lg overflow-hidden shadow-lg border border-gray-700 hover:border-orange-500 transition-colors relative"
                   >
                     {!isVideoLiberadoParaUsuario(video.id) && !isAdmin && (
-                      <div className="absolute inset-0 bg-black bg-opacity-40 z-0">
-                        {/* Apenas escurecendo levemente o vídeo sem texto */}
+                      <div className="absolute inset-0 bg-gray-900 bg-opacity-75 z-0 backdrop-blur-[2px] flex items-center justify-center">
+                        {/* Overlay mais escuro e com maior opacidade para vídeos bloqueados */}
+                        <div className="text-white text-opacity-90 text-lg font-bold bg-black bg-opacity-50 p-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6-4h12M9 9V7a3 3 0 0 1 6 0v2" />
+                            <rect x="7" y="11" width="10" height="10" rx="2" strokeWidth={2} />
+                          </svg>
+                          BLOQUEADO
+                        </div>
                       </div>
                     )}
                     {/* Thumbnail do vídeo - área clicável */}
                     <div 
-                      className="relative h-110 overflow-hidden"
+                      className="relative h-140 overflow-hidden"
                       onClick={() => youtubeLinks[video.id] ? abrirVideoYoutube(video.id) : null}
                       style={{ cursor: youtubeLinks[video.id] ? 'pointer' : 'default' }}
                     >
                                 {/* Imagem de thumbnail */}
                                 <div 
-                                  className="absolute inset-0 bg-cover bg-center" 
+                                  className="absolute inset-0 bg-cover bg-center transition-all duration-300" 
                                   style={{
                                     backgroundImage: `url(${video.thumbnail})`,
                                     backgroundSize: 'cover',
                                     backgroundPosition: 'center',
-                                    backgroundRepeat: 'no-repeat'
+                                    backgroundRepeat: 'no-repeat',
+                                    filter: !isVideoLiberadoParaUsuario(video.id) && !isAdmin ? 'grayscale(1) brightness(0.6) contrast(1.2)' : 'none'
                                   }} 
                                 />
                                 
                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent hover:from-black/50 transition-all duration-300">
                               
-                        {/* Ícone do YouTube para administradores - usando o componente personalizado */}
+                        {/* Ícones para administradores */}
                         {isAdmin && (
-                          <button 
-                            onClick={(e) => abrirModalYoutube(e, video)}
-                            className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors z-20 hover:scale-110 hover:shadow-lg hover:shadow-red-500/50 cursor-pointer transform transition-all duration-200 ease-in-out"
-                            title="Adicionar link do YouTube"
-                          >
-                            <YouTubeIcon size={16} />
-                          </button>
+                          <div className="absolute top-2 right-2 flex space-x-2 z-20">
+                            {/* Ícone do YouTube para administradores */}
+                            <button 
+                              onClick={(e) => abrirModalYoutube(e, video)}
+                              className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors hover:scale-110 hover:shadow-lg hover:shadow-red-500/50 cursor-pointer transform transition-all duration-200 ease-in-out"
+                              title="Adicionar link do YouTube"
+                            >
+                              <YouTubeIcon size={16} />
+                            </button>
+                          </div>
                         )}
                         
                         
@@ -739,56 +696,7 @@ export default function VideosPage() {
                       </div>
                     </div>
                     
-                    {/* Informações do vídeo - texto estático sem interação */}
-                    <div className="p-4">
-                      {/* Removed the small lock icon in the top-right corner as requested */}
-                      {editingTitleId === video.id ? (
-                        <div className="flex items-center">
-                          <input
-                            type="text"
-                            value={editedTitle}
-                            onChange={(e) => setEditedTitle(e.target.value)}
-                            className="text-lg font-bold text-white bg-gray-700 border border-orange-500 rounded px-2 py-1 w-full"
-                            autoFocus
-                            onBlur={() => saveEditedTitle(video.id, module.id)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                saveEditedTitle(video.id, module.id);
-                              } else if (e.key === 'Escape') {
-                                setEditingTitleId(null);
-                              }
-                            }}
-                          />
-                        </div>
-                      ) : (
-                        <h3 
-                          className={`font-bold text-white mb-2 text-center select-none ${isAdmin ? 'cursor-pointer hover:text-orange-400' : ''}`}
-                          onClick={(e) => isAdmin && startEditingTitle(e, video)}
-                          title={video.title}
-                          style={{
-                            fontSize: video.title.length > 30 ? `${Math.max(0.7, Math.min(1, 15 / Math.max(1, video.title.length / 12)))}rem` : '1rem',
-                            lineHeight: '1.3',
-                            minHeight: '2.5rem', // Aumentado de 1.5rem para 2.5rem
-                            maxHeight: '4rem',   // Aumentado de 3rem para 4rem
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            overflow: 'hidden',
-                            wordBreak: 'break-word',
-                            hyphens: 'auto',
-                            padding: '0.25rem'   // Adicionado padding para melhor espaçamento
-                          }}
-                        >
-                          {video.title}
-                          {isAdmin && (
-                            <span className="ml-1 text-xs text-gray-400 opacity-50 hover:opacity-100 flex-shrink-0">
-                              ✏️
-                            </span>
-                          )}
-                        </h3>
-                      )}
-                      {/* Removido o botão "Assistir aula"/"Assistir no YouTube" */}
-                    </div>
+                    {/* Área de edição de título removida */}
                   </div>
                 ))}
               </div>
