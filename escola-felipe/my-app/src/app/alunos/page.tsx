@@ -1,11 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
 
+interface Aluno {
+  id: string;
+  nome: string;
+  email: string;
+  telefone: string;
+  dataNascimento: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function AlunosPage() {
   // Estados para os alunos e formulários
-  const [alunos, setAlunos] = useState([]);
+  const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [novoAluno, setNovoAluno] = useState({ nome: '', login: '', senha: '' });
-  const [alunoEditando, setAlunoEditando] = useState(null);
+  const [alunoEditando, setAlunoEditando] = useState<Aluno | null>(null);
   
   // Adicionar um estado separado para cada modal
   const [mostrarModalAdicionar, setMostrarModalAdicionar] = useState(false);
@@ -34,7 +44,7 @@ export default function AlunosPage() {
   };
   
   // Função para abrir o formulário de editar
-  const abrirFormularioEditar = (aluno) => {
+  const abrirFormularioEditar = (aluno: any) => {
     console.log("Abrindo formulário de editar", aluno);
     // Primeiro, feche todos os modais
     setMostrarModalAdicionar(false);
